@@ -1,0 +1,26 @@
+meta {
+  name: Get All Addresses
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/addresses
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc3MTg0MzIxOH0.qR1ZKuRfpQ-B7ccbBLHHBp-Tz0D-A8nPBXRDixcmdw0
+}
+
+docs {
+  Récupère toutes les adresses favorites de l'utilisateur connecté.
+  
+  Requiert un token d'authentification.
+}

@@ -1,0 +1,38 @@
+meta {
+  name: Create Address
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/addresses
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "searchWord": "Tour Eiffel, Paris",
+    "name": "Tour Eiffel",
+    "description": "Monument emblématique de Paris"
+  }
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc3MTg0MzIxOH0.qR1ZKuRfpQ-B7ccbBLHHBp-Tz0D-A8nPBXRDixcmdw0
+}
+
+docs {
+  Crée une nouvelle adresse favorite en recherchant les coordonnées.
+  
+  - searchWord: adresse à rechercher (géocodage)
+  - name: nom de l'adresse (requis)
+  - description: description optionnelle
+  
+  Requiert un token d'authentification.
+}

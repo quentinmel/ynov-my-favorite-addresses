@@ -1,0 +1,28 @@
+meta {
+  name: Create User
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/users
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "test@example.com",
+    "password": "password123"
+  }
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+}
+
+docs {
+  Crée un nouvel utilisateur avec email et mot de passe.
+  
+  Le mot de passe sera hashé avec argon2 avant d'être stocké.
+}

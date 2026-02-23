@@ -1,0 +1,42 @@
+meta {
+  name: Search Addresses by Radius
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/addresses/searches
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "from": {
+      "lat": 48.8584,
+      "lng": 2.2945
+    },
+    "radius": 5000
+  }
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc3MTg0MzIxOH0.qR1ZKuRfpQ-B7ccbBLHHBp-Tz0D-A8nPBXRDixcmdw0
+}
+
+docs {
+  Recherche les adresses favorites dans un rayon donné (en mètres).
+  
+  - from.lat: latitude du point de départ (nombre)
+  - from.lng: longitude du point de départ (nombre)
+  - radius: rayon en mètres (nombre positif)
+  
+  Exemple: recherche dans un rayon de 5km autour des coordonnées de la Tour Eiffel.
+  
+  Requiert un token d'authentification.
+}
