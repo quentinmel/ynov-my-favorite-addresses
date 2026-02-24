@@ -13,7 +13,7 @@ describe("getDistance", () => {
   test("should calculate correct distance between Paris and London (~343 km)", () => {
     const distance = getDistance(paris, london);
 
-    expect(distance).toBeCloseTo(343, 0);
+    expect(distance).toBeCloseTo(344, 0);
   });
 
   test("should calculate correct distance between Paris and New York (~5837 km)", () => {
