@@ -1,7 +1,7 @@
 import express from "express";
 import apiRouter from "./router";
 
-const app = express();
+export const app = express();
 
 // use JSON for req.body
 app.use(express.json());
