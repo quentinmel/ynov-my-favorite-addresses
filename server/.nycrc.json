@@ -1,0 +1,7 @@
+{
+  "extends": "@istanbuljs/nyc-config-typescript",
+  "include": ["src/**/*.ts"],
+  "exclude": ["src/**/*.spec.ts", "src/index.ts"],
+  "reporter": ["text", "html"],
+  "report-dir": "./coverage-e2e"
+}
