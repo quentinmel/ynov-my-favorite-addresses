@@ -40,6 +40,37 @@ addressesRouter.get("/", isAuthorized, async (req, res) => {
   return res.json({ items: addresses });
 });
 
+addressesRouter.put("/:id", isAuthorized, async (req, res) => {
+  const id = Number(req.params.id);
+  const name = req.body.name;
+  const description = req.body.description;
+
+  if (!id || Number.isNaN(id)) {
+    return res.status(400).json({ message: "invalid id" });
+  }
+
+  if (!name) {
+    return res.status(400).json({ message: "name is required" });
+  }
+
+  const user = await getUserFromRequest(req);
+  const address = await Address.findOne({
+    where: { id, user: { id: user.id } },
+  });
+
+  if (!address) {
+    return res.status(404).json({ message: "address not found" });
+  }
+
+  address.name = name;
+  if (description !== undefined) {
+    address.description = description;
+  }
+
+  await address.save();
+  return res.json({ item: address });
+});
+
 addressesRouter.post("/searches", isAuthorized, async (req, res) => {
   const radius = req.body.radius;
 
