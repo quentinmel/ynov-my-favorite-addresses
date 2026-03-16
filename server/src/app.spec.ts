@@ -41,6 +41,24 @@ describe("POST /api/users", () => {
     ctx.userId = response.body.item.id;
   });
 
+  it("retourne 400 si email invalide", async () => {
+    const response = await request(app)
+      .post("/api/users")
+      .send({ email: "not-an-email", password: "password123" });
+
+    expect(response.status).toBe(400);
+    expect(response.body.message).toBe("invalid email");
+  });
+
+  it("retourne 400 si email déjà utilisé", async () => {
+    const response = await request(app)
+      .post("/api/users")
+      .send({ email: ctx.email, password: "password123" });
+
+    expect(response.status).toBe(400);
+    expect(response.body.message).toBe("email already used");
+  });
+
   it("retourne 400 si email ou password manquant", async () => {
     const response = await request(app)
       .post("/api/users")
