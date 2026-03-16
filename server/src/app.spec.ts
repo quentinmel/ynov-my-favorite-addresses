@@ -171,6 +171,45 @@ describe("Addresses - CRUD complet", () => {
     ctx.addressId = response.body.item.id;
   });
 
+  it("PUT /api/addresses/:id - modifie une adresse", async () => {
+    const response = await request(app)
+      .put(`/api/addresses/${ctx.addressId}`)
+      .set("Authorization", `Bearer ${ctx.token}`)
+      .send({ name: "Adresse modifiée", description: "Nouvelle description" });
+
+    expect(response.status).toBe(200);
+    expect(response.body.item).toBeDefined();
+    expect(response.body.item.name).toBe("Adresse modifiée");
+    expect(response.body.item.description).toBe("Nouvelle description");
+  });
+
+  it("PUT /api/addresses/:id - retourne 400 si name manquant", async () => {
+    const response = await request(app)
+      .put(`/api/addresses/${ctx.addressId}`)
+      .set("Authorization", `Bearer ${ctx.token}`)
+      .send({ description: "Description seule" });
+
+    expect(response.status).toBe(400);
+    expect(response.body.message).toBe("name is required");
+  });
+
+  it("PUT /api/addresses/:id - retourne 404 si adresse inconnue", async () => {
+    const response = await request(app)
+      .put(`/api/addresses/999999`)
+      .set("Authorization", `Bearer ${ctx.token}`)
+      .send({ name: "Adresse inexistante" });
+
+    expect(response.status).toBe(404);
+  });
+
+  it("PUT /api/addresses/:id - retourne 403 sans authentification", async () => {
+    const response = await request(app)
+      .put(`/api/addresses/${ctx.addressId}`)
+      .send({ name: "Adresse modifiée" });
+
+    expect(response.status).toBe(403);
+  });
+
   it("POST /api/addresses - retourne 400 si name ou searchWord manquant", async () => {
     const response = await request(app)
       .post("/api/addresses")
