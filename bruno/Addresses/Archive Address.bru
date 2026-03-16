@@ -1,0 +1,39 @@
+meta {
+  name: Archive Address
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/api/addresses/{{addressId}}/archive
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "archived": true
+  }
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+  token: {{token}}
+  addressId: 1
+}
+
+docs {
+  Archive une adresse existante.
+  
+  - archived: true pour archiver, false pour restaurer
+  - L'utilisateur doit être propriétaire de l'adresse
+  
+  Réponse attendue:
+  - 200 + item mis à jour
+  - 404 si adresse inconnue
+  - 403 si non authentifié
+}
