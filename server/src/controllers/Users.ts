@@ -17,6 +17,16 @@ usersRouter.post("/", async (req, res) => {
     return res.status(400).json({ message: `email and password are required` });
   }
 
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({ message: "invalid email" });
+  }
+
+  const existingUser = await User.findOneBy({ email });
+  if (existingUser) {
+    return res.status(400).json({ message: "email already used" });
+  }
+
   try {
     const user = new User();
     user.email = email;
