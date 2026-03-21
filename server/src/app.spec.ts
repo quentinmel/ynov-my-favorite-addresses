@@ -228,6 +228,17 @@ describe("Addresses - CRUD complet", () => {
     expect(response.status).toBe(403);
   });
 
+  it("PATCH /api/addresses/:id/verify - marque une adresse comme vérifiée", async () => {
+    const response = await request(app)
+      .patch(`/api/addresses/${ctx.addressId}/verify`)
+      .set("Authorization", `Bearer ${ctx.token}`)
+      .send({ verified: true });
+
+    expect(response.status).toBe(200);
+    expect(response.body.item).toBeDefined();
+    expect(response.body.item.verified).toBe(true);
+  });
+
   it("POST /api/addresses - retourne 400 si name ou searchWord manquant", async () => {
     const response = await request(app)
       .post("/api/addresses")
