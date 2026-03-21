@@ -1,3 +1,70 @@
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Space+Grotesk:wght@400;500;600&display=swap");
+
+:root {
+  --bg-1: #f6f2ea;
+  --bg-2: #e9f2f0;
+  --surface: #ffffff;
+  --text: #1f2a2e;
+  --muted: #5b6b73;
+  --primary: #1f7a5a;
+  --primary-600: #166447;
+  --accent: #f2a23a;
+  --ring: rgba(31, 122, 90, 0.25);
+  --shadow: 0 16px 40px rgba(16, 24, 28, 0.12);
+  --radius: 14px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
 body {
-  background-color: #e7e7e7;
+  margin: 0;
+  font-family: "Space Grotesk", system-ui, sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(1200px 600px at 15% -10%, rgba(242, 162, 58, 0.18), transparent 60%),
+    radial-gradient(900px 500px at 85% 10%, rgba(31, 122, 90, 0.18), transparent 55%),
+    linear-gradient(180deg, var(--bg-1), var(--bg-2));
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  padding: 24px 16px 40px;
+}
+
+h1,
+h2,
+h3 {
+  font-family: "Fraunces", serif;
+  letter-spacing: -0.02em;
+  margin: 0 0 8px;
+}
+
+p {
+  margin: 0 0 8px;
+  color: var(--muted);
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0 0;
+  width: 100%;
+}
+
+li {
+  padding: 10px 12px;
+  border: 1px solid rgba(31, 42, 46, 0.08);
+  border-radius: 10px;
+  margin-bottom: 8px;
+  background: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }

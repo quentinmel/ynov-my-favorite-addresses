@@ -4,11 +4,11 @@ import { Row } from "../components/Row";
 
 export function HomePage() {
   return (
-    <Layout title="Home page">
-      <p>Welcome on My Favorite Places</p>
+    <Layout title="Welcome">
+      <p>Save and organize your favorite places.</p>
       <Row>
-        <ButtonLink to="/signin">Signin</ButtonLink>
-        <ButtonLink to="/signup">Signup</ButtonLink>
+        <ButtonLink to="/signin">Sign in</ButtonLink>
+        <ButtonLink to="/signup">Create account</ButtonLink>
       </Row>
     </Layout>
   );

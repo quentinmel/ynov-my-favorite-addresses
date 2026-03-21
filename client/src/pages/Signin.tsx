@@ -41,12 +41,12 @@ export function SigninPage() {
   }
 
   return (
-    <Layout title="Home page">
-      <p>Sign in on the App</p>
+    <Layout title="Sign in">
+      <p>Access your dashboard and saved places.</p>
       <Form onSubmit={onSubmit}>
-        <Input name="email" type="email" placeholder="User email" />
+        <Input name="email" type="email" placeholder="Email address" />
         <Input name="password" type="password" placeholder="Password" />
-        <Button type="submit">Signin</Button>
+        <Button type="submit">Sign in</Button>
       </Form>
     </Layout>
   );

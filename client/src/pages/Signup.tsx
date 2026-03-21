@@ -35,12 +35,12 @@ export function SignupPage() {
   }
 
   return (
-    <Layout title="Home page">
-      <p>Signup on the app</p>
+    <Layout title="Create account">
+      <p>Create your MFP account in seconds.</p>
       <Form onSubmit={onSubmit}>
-        <Input name="email" type="email" placeholder="User email" />
+        <Input name="email" type="email" placeholder="Email address" />
         <Input name="password" type="password" placeholder="Password" />
-        <Button type="submit">Signup</Button>
+        <Button type="submit">Create account</Button>
       </Form>
     </Layout>
   );

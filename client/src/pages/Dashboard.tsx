@@ -78,20 +78,52 @@ export function DashboardPage() {
     }
   }
 
+  async function onToggleVerified(id: number, next: boolean) {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      toast.error("You must be signed in");
+      return;
+    }
+
+    try {
+      const { data } = await axios.patch(
+        `/api/addresses/${id}/verify`,
+        { verified: next },
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+      if (data?.item?.id) {
+        setAddresses((prev) =>
+          prev.map((address) =>
+            address.id === id ? { ...address, verified: next } : address,
+          ),
+        );
+        toast.success(next ? "Marked as verified" : "Marked as not verified");
+      } else {
+        toast.error("Unable to update verification");
+      }
+    } catch (err: any) {
+      const message =
+        err?.response?.data?.message ||
+        err?.message ||
+        "Unable to update verification";
+      toast.error(message);
+    }
+  }
+
   function onSignout() {
     sessionStorage.clear();
     localStorage.clear();
     location.href = "/";
   }
   return (
-    <Layout title="Dashboard page">
-      <p>Welcome on your dashboard</p>
+    <Layout title="Your dashboard">
+      <p>Your saved places and verification status.</p>
       {userEmail && <p>Signed in as {userEmail}</p>}
       <div>
-        <h3>Create an address</h3>
+        <h3>Create a place</h3>
         <Form onSubmit={onCreateAddress}>
-          <Input name="searchWord" placeholder="Search word (e.g. Paris)" />
-          <Input name="name" placeholder="Address name" />
+          <Input name="searchWord" placeholder="Search keyword (e.g. Paris)" />
+          <Input name="name" placeholder="Place name" />
           <Input name="description" placeholder="Description (optional)" />
           <Button type="submit" disabled={creating}>
             {creating ? "Creating..." : "Create address"}
@@ -99,24 +131,34 @@ export function DashboardPage() {
         </Form>
       </div>
       <div>
-        <h3>Your addresses</h3>
+        <h3>Your places</h3>
         {loading ? (
-          <p>Loading your addresses...</p>
+          <p>Loading your places...</p>
         ) : addresses.length === 0 ? (
-          <p>No addresses yet. Create one via the API to see the badge here.</p>
+          <p>No places yet. Create one above to see the badge.</p>
         ) : (
           <ul>
             {addresses.map((address) => (
               <li key={address.id}>
                 {address.name}
                 {address.verified ? " ✅ Verified" : " ⚠️ Not verified"}
+                <label style={{ marginLeft: 8 }}>
+                  <input
+                    type="checkbox"
+                    checked={address.verified}
+                    onChange={(e) =>
+                      onToggleVerified(address.id, e.target.checked)
+                    }
+                  />{" "}
+                  Verified
+                </label>
               </li>
             ))}
           </ul>
         )}
       </div>
       <Row>
-        <Button onClick={onSignout}>Signout</Button>
+        <Button onClick={onSignout}>Sign out</Button>
       </Row>
     </Layout>
   );
