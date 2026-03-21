@@ -25,6 +25,9 @@ export class Address extends BaseEntity {
   @Column("float")
   lat: number;
 
+  @Column({ default: false })
+  verified: boolean;
+
   @ManyToOne(() => User, (user) => user.addresses)
   user: User;
 
