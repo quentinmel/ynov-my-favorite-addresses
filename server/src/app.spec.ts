@@ -271,6 +271,47 @@ describe("Addresses - CRUD complet", () => {
     expect(response.body.items.length).toBeGreaterThanOrEqual(1);
   });
 
+  it("GET /api/addresses - ne retourne pas les adresses d'un autre utilisateur", async () => {
+    const email = faker.internet.email();
+    const password = faker.internet.password({ length: 12 });
+
+    const createRes = await request(app)
+      .post("/api/users")
+      .send({ email, password });
+
+    const tokenRes = await request(app)
+      .post("/api/users/tokens")
+      .send({ email, password });
+
+    const otherToken = tokenRes.body.token;
+
+    const otherAddresses = await request(app)
+      .get("/api/addresses")
+      .set("Authorization", `Bearer ${otherToken}`);
+
+    const ids = (otherAddresses.body.items || []).map((item: any) => item.id);
+    expect(ids).not.toContain(ctx.addressId);
+    expect(createRes.status).toBe(200);
+    expect(tokenRes.status).toBe(200);
+  });
+
+  it("PUT /api/addresses/:id - interdit la modification par un autre utilisateur", async () => {
+    const email = faker.internet.email();
+    const password = faker.internet.password({ length: 12 });
+
+    await request(app).post("/api/users").send({ email, password });
+    const tokenRes = await request(app)
+      .post("/api/users/tokens")
+      .send({ email, password });
+
+    const response = await request(app)
+      .put(`/api/addresses/${ctx.addressId}`)
+      .set("Authorization", `Bearer ${tokenRes.body.token}`)
+      .send({ name: "Tentative d'édition" });
+
+    expect(response.status).toBe(404);
+  });
+
   it("GET /api/addresses - retourne 403 sans authentification", async () => {
     const response = await request(app).get("/api/addresses");
 
