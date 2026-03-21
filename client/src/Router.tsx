@@ -30,7 +30,7 @@ export function Router() {
       });
 
       if (data?.item?.id) {
-        sessionStorage.setItem("user", data?.item);
+        sessionStorage.setItem("user", JSON.stringify(data?.item));
       }
 
       setReady(true);
