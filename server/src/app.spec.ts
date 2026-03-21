@@ -263,7 +263,7 @@ describe("Addresses - CRUD complet", () => {
       .send({ name: "Test" });
 
     expect(response.status).toBe(400);
-    expect(response.body.message).toBe("name and search word are required");
+    expect(response.body.message).toBe("search word or lat/lng are required");
   });
 
   it("POST /api/addresses - retourne 404 si l'adresse n'est pas trouvée par l'API geo", async () => {
