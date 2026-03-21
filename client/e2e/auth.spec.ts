@@ -5,7 +5,7 @@ test.describe('Authentication Flow', () => {
   test('should display Signup button on home page and navigate to signup', async ({ page }) => {
     await page.goto('/');
 
-    const signupButton = page.getByRole('link', { name: 'Signup' });
+    const signupButton = page.getByRole('link', { name: 'Create account' });
     await expect(signupButton).toBeVisible();
 
     await signupButton.click();
@@ -19,10 +19,10 @@ test.describe('Authentication Flow', () => {
 
     await page.goto('/signup');
 
-    await page.getByPlaceholder('User email').fill(testEmail);
+    await page.getByPlaceholder('Email address').fill(testEmail);
     await page.getByPlaceholder('Password').fill(testPassword);
 
-    await page.getByRole('button', { name: 'Signup' }).click();
+    await page.getByRole('button', { name: 'Create account' }).click();
 
     await expect(page.getByText('User created, you can signin')).toBeVisible({ timeout: 10000 });
 
@@ -40,17 +40,17 @@ test.describe('Authentication Flow', () => {
 
     await page.goto('/signin');
 
-    await page.getByPlaceholder('User email').fill(testEmail);
+    await page.getByPlaceholder('Email address').fill(testEmail);
     await page.getByPlaceholder('Password').fill(testPassword);
 
-    await page.getByRole('button', { name: 'Signin' }).click();
+    await page.getByRole('button', { name: 'Sign in' }).click();
 
     // ✅ Vérifier le toast (maintenant visible grâce au délai dans SigninPage)
     await expect(page.getByText('You are connected')).toBeVisible({ timeout: 10000 });
 
     // ✅ Attendre la navigation vers le dashboard
     await page.waitForURL('/', { timeout: 15000 });
-    await expect(page.getByText('Welcome on your dashboard')).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText('Your saved places and verification status.')).toBeVisible({ timeout: 10000 });
   });
 
 });

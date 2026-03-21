@@ -33,6 +33,13 @@ cd client
 npm run dev -- --port 5174
 ```
 
+### Dashboard features
+
+- Create places from the dashboard
+- Verify/unverify places (badge)
+- CSV import/export (template included)
+- Open a place or all places in Google Maps
+
 ---
 
 ## Testing Strategy
@@ -69,6 +76,18 @@ npm run test:e2e
 
 # Or with the interactive Playwright UI
 npx playwright test --ui
+```
+
+### Run E2E with API coverage
+
+```bash
+# Terminal 1
+cd server
+npm run dev:coverage
+
+# Terminal 2
+cd client
+npm run test:e2e:coverage
 ```
 ---
 
