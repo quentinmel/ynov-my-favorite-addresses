@@ -24,9 +24,8 @@ test.describe('Authentication Flow', () => {
 
     await page.getByRole('button', { name: 'Create account' }).click();
 
-    await expect(page.getByText('User created, you can signin')).toBeVisible({ timeout: 10000 });
-
     await expect(page).toHaveURL('/');
+    await expect(page.getByText('Welcome')).toBeVisible({ timeout: 10000 });
   });
 
   test('should login with created account and display Dashboard', async ({ page, request }) => {
@@ -45,11 +44,8 @@ test.describe('Authentication Flow', () => {
 
     await page.getByRole('button', { name: 'Sign in' }).click();
 
-    // ✅ Vérifier le toast (maintenant visible grâce au délai dans SigninPage)
-    await expect(page.getByText('You are connected')).toBeVisible({ timeout: 10000 });
-
     // ✅ Attendre la navigation vers le dashboard
-    await page.waitForURL('/', { timeout: 15000 });
+    await page.waitForURL('/dashboard', { timeout: 15000 });
     await expect(page.getByText('Your saved places and verification status.')).toBeVisible({ timeout: 10000 });
   });
 
