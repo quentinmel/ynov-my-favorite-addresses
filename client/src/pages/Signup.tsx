@@ -13,16 +13,24 @@ export function SignupPage() {
     e.preventDefault();
     const form = new FormData(e.target);
     const json = { email: form.get("email"), password: form.get("password") };
-    const { data } = await axios.post<{ item: { id: number } }>(
-      "/api/users",
-      json,
-    );
+    try {
+      const { data } = await axios.post<{ item: { id: number } }>(
+        "/api/users",
+        json,
+      );
 
-    if (data?.item?.id) {
-      toast.success("User created, you can signin");
-      navigate("/", { replace: true });
-    } else {
-      toast.error("Unable to create user");
+      if (data?.item?.id) {
+        toast.success("User created, you can signin");
+        navigate("/", { replace: true });
+      } else {
+        toast.error("Unable to create user");
+      }
+    } catch (err: any) {
+      const message =
+        err?.response?.data?.message ||
+        err?.message ||
+        "Unable to create user";
+      toast.error(message);
     }
   }
 
