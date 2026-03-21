@@ -40,6 +40,10 @@ npm run dev -- --port 5174
 - CSV import/export (template included)
 - Open a place or all places in Google Maps
 
+## Deliverables
+
+All course deliverables (PDF/Excel) are stored in the `exercice/` folder at the repository root.
+
 ---
 
 ## Testing Strategy
