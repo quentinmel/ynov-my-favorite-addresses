@@ -11,14 +11,28 @@ addressesRouter.post("/", isAuthorized, async (req, res) => {
   const searchWord = req.body.searchWord;
   const name = req.body.name;
   const description = req.body.description;
+  const lat = req.body.lat;
+  const lng = req.body.lng;
 
-  if (!searchWord || !name) {
-    return res
-      .status(400)
-      .json({ message: `name and search word are required` });
+  if (!name) {
+    return res.status(400).json({ message: `name is required` });
   }
 
-  const coordinates = await getCoordinatesFromSearch(searchWord);
+  const hasLatLng =
+    typeof lat === "number" && typeof lng === "number" && !Number.isNaN(lat) && !Number.isNaN(lng);
+
+  if (!searchWord && !hasLatLng) {
+    return res.status(400).json({
+      message: `search word or lat/lng are required`,
+    });
+  }
+
+  let coordinates = null;
+  if (hasLatLng) {
+    coordinates = { lat, lng };
+  } else if (searchWord) {
+    coordinates = await getCoordinatesFromSearch(searchWord);
+  }
 
   if (coordinates) {
     const user = await getUserFromRequest(req);

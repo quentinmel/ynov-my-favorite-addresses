@@ -189,6 +189,23 @@ describe("Addresses - CRUD complet", () => {
     ctx.addressId = response.body.item.id;
   });
 
+  it("POST /api/addresses - crée une adresse avec lat/lng sans géocodage", async () => {
+    const response = await request(app)
+      .post("/api/addresses")
+      .set("Authorization", `Bearer ${ctx.token}`)
+      .send({
+        name: "Adresse latlng",
+        description: "Sans geocodage",
+        lat: 48.85837,
+        lng: 2.29448,
+      });
+
+    expect(response.status).toBe(200);
+    expect(response.body.item).toBeDefined();
+    expect(response.body.item.lat).toBe(48.85837);
+    expect(response.body.item.lng).toBe(2.29448);
+  });
+
   it("PUT /api/addresses/:id - modifie une adresse", async () => {
     const response = await request(app)
       .put(`/api/addresses/${ctx.addressId}`)

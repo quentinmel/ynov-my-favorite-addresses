@@ -155,9 +155,10 @@ export function DashboardPage() {
 
   function downloadCsvTemplate() {
     const template =
-      "searchWord,name,description\n" +
-      "Paris,Maison du cafe,Bon espresso\n" +
-      "Tour Eiffel,Point de vue,Belle vue\n";
+      "name,description,lat,lng\n" +
+      "Campus Ynov Lyon,,45.7498724,4.8229988\n" +
+      "Facepunch Studios,,52.4810493,-1.9024345\n" +
+      "Eiffel Tower,,48.85837,2.29448\n";
     const blob = new Blob([template], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -214,9 +215,18 @@ export function DashboardPage() {
       const searchWordIdx = header.indexOf("searchword");
       const nameIdx = header.indexOf("name");
       const descriptionIdx = header.indexOf("description");
+      const latIdx = header.indexOf("lat");
+      const lngIdx = header.indexOf("lng");
 
-      if (searchWordIdx === -1 || nameIdx === -1) {
-        toast.error("CSV header must include searchWord and name");
+      const hasGeo = latIdx !== -1 && lngIdx !== -1;
+      const hasSearchWord = searchWordIdx !== -1;
+
+      if (nameIdx === -1) {
+        toast.error("CSV header must include name");
+        return;
+      }
+      if (!hasGeo && !hasSearchWord) {
+        toast.error("CSV must include either searchWord or lat,lng");
         return;
       }
 
@@ -226,35 +236,55 @@ export function DashboardPage() {
       }
 
       let created = 0;
+      let skipped = 0;
       for (let i = 1; i < lines.length; i += 1) {
         const cols = parseCsvLine(lines[i]);
-        const payload = {
-          searchWord: cols[searchWordIdx],
-          name: cols[nameIdx],
-          description: descriptionIdx >= 0 ? cols[descriptionIdx] : undefined,
-        };
-        if (!payload.searchWord || !payload.name) {
-          toast.error(`Row ${i + 1} is missing searchWord or name`);
-          return;
+        const name = cols[nameIdx];
+        const description = descriptionIdx >= 0 ? cols[descriptionIdx] : undefined;
+        const lat = hasGeo ? Number(cols[latIdx]) : undefined;
+        const lng = hasGeo ? Number(cols[lngIdx]) : undefined;
+        const searchWord = hasSearchWord ? cols[searchWordIdx] : undefined;
+
+        if (!name) {
+          skipped += 1;
+          continue;
         }
-        if (String(payload.searchWord).length < 3) {
-          toast.error(`Row ${i + 1} searchWord is too short`);
-          return;
+        if (String(name).length < 2) {
+          skipped += 1;
+          continue;
         }
-        if (String(payload.name).length < 2) {
-          toast.error(`Row ${i + 1} name is too short`);
-          return;
+        if (hasGeo) {
+          if (Number.isNaN(lat) || Number.isNaN(lng)) {
+            skipped += 1;
+            continue;
+          }
+        } else {
+          if (!searchWord || String(searchWord).length < 3) {
+            skipped += 1;
+            continue;
+          }
         }
-        const { data } = await axios.post("/api/addresses", payload, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (data?.item?.id) {
-          created += 1;
-          setAddresses((prev) => [data.item, ...prev]);
+
+        try {
+          const payload = hasGeo
+            ? { name, description, lat, lng }
+            : { name, description, searchWord };
+
+          const { data } = await axios.post("/api/addresses", payload, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (data?.item?.id) {
+            created += 1;
+            setAddresses((prev) => [data.item, ...prev]);
+          } else {
+            skipped += 1;
+          }
+        } catch {
+          skipped += 1;
         }
       }
 
-      toast.success(`Imported ${created} address(es)`);
+      toast.success(`Imported ${created} address(es), skipped ${skipped}`);
       e.target.value = "";
     } catch (err: any) {
       const message =
@@ -322,7 +352,10 @@ export function DashboardPage() {
       </div>
       <div>
         <h3>Import / export</h3>
-        <p>CSV import expects headers: searchWord,name,description</p>
+        <p>
+          CSV import supports either: name,description,lat,lng (preferred) or
+          searchWord,name,description.
+        </p>
         <Row>
           <Button type="button" onClick={exportCsv}>
             Export CSV
@@ -362,29 +395,37 @@ export function DashboardPage() {
             <ul>
               {addresses.map((address) => (
                 <li key={address.id}>
-                  <div>
-                    <strong>{address.name}</strong>
-                    {address.description && <div>{address.description}</div>}
-                    <a
-                      href={getGoogleMapsLink(address)}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      Open in Google Maps
-                    </a>
-                  </div>
-                  <div>
-                    {address.verified ? " ✅ Verified" : " ⚠️ Not verified"}
-                    <label style={{ marginLeft: 8 }}>
-                      <input
-                        type="checkbox"
-                        checked={address.verified}
-                        onChange={(e) =>
-                          onToggleVerified(address.id, e.target.checked)
-                        }
-                      />{" "}
-                      Verified
-                    </label>
+                  <div className="place-card">
+                    <div className="place-info">
+                      <strong>{address.name}</strong>
+                      {address.description && <div>{address.description}</div>}
+                      <a
+                        href={getGoogleMapsLink(address)}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Open in Google Maps
+                      </a>
+                    </div>
+                    <div className="place-meta">
+                      <span
+                        className={`badge ${
+                          address.verified ? "verified" : "pending"
+                        }`}
+                      >
+                        {address.verified ? "Verified" : "Not verified"}
+                      </span>
+                      <label className="verify-toggle">
+                        <input
+                          type="checkbox"
+                          checked={address.verified}
+                          onChange={(e) =>
+                            onToggleVerified(address.id, e.target.checked)
+                          }
+                        />
+                        Verified
+                      </label>
+                    </div>
                   </div>
                 </li>
               ))}
