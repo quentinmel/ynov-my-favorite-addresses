@@ -11,14 +11,28 @@ addressesRouter.post("/", isAuthorized, async (req, res) => {
   const searchWord = req.body.searchWord;
   const name = req.body.name;
   const description = req.body.description;
+  const lat = req.body.lat;
+  const lng = req.body.lng;
 
-  if (!searchWord || !name) {
-    return res
-      .status(400)
-      .json({ message: `name and search word are required` });
+  if (!name) {
+    return res.status(400).json({ message: `name is required` });
   }
 
-  const coordinates = await getCoordinatesFromSearch(searchWord);
+  const hasLatLng =
+    typeof lat === "number" && typeof lng === "number" && !Number.isNaN(lat) && !Number.isNaN(lng);
+
+  if (!searchWord && !hasLatLng) {
+    return res.status(400).json({
+      message: `search word or lat/lng are required`,
+    });
+  }
+
+  let coordinates = null;
+  if (hasLatLng) {
+    coordinates = { lat, lng };
+  } else if (searchWord) {
+    coordinates = await getCoordinatesFromSearch(searchWord);
+  }
 
   if (coordinates) {
     const user = await getUserFromRequest(req);
@@ -26,6 +40,7 @@ addressesRouter.post("/", isAuthorized, async (req, res) => {
     address.name = name;
     address.description = description;
     Object.assign(address, coordinates);
+    address.verified = false;
     address.user = user;
     await address.save();
     return res.json({ item: address });
@@ -38,6 +53,63 @@ addressesRouter.get("/", isAuthorized, async (req, res) => {
   const user = await getUserFromRequest(req);
   const addresses = await Address.findBy({ user: { id: user.id } });
   return res.json({ items: addresses });
+});
+
+addressesRouter.patch("/:id/verify", isAuthorized, async (req, res) => {
+  const id = Number(req.params.id);
+  const verified = req.body.verified;
+
+  if (!id || Number.isNaN(id)) {
+    return res.status(400).json({ message: "invalid id" });
+  }
+
+  if (typeof verified !== "boolean") {
+    return res.status(400).json({ message: "verified must be boolean" });
+  }
+
+  const user = await getUserFromRequest(req);
+  const address = await Address.findOne({
+    where: { id, user: { id: user.id } },
+  });
+
+  if (!address) {
+    return res.status(404).json({ message: "address not found" });
+  }
+
+  address.verified = verified;
+  await address.save();
+  return res.json({ item: address });
+});
+
+addressesRouter.put("/:id", isAuthorized, async (req, res) => {
+  const id = Number(req.params.id);
+  const name = req.body.name;
+  const description = req.body.description;
+
+  if (!id || Number.isNaN(id)) {
+    return res.status(400).json({ message: "invalid id" });
+  }
+
+  if (!name) {
+    return res.status(400).json({ message: "name is required" });
+  }
+
+  const user = await getUserFromRequest(req);
+  const address = await Address.findOne({
+    where: { id, user: { id: user.id } },
+  });
+
+  if (!address) {
+    return res.status(404).json({ message: "address not found" });
+  }
+
+  address.name = name;
+  if (description !== undefined) {
+    address.description = description;
+  }
+
+  await address.save();
+  return res.json({ item: address });
 });
 
 addressesRouter.post("/searches", isAuthorized, async (req, res) => {

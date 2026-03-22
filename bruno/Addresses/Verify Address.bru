@@ -1,0 +1,40 @@
+meta {
+  name: Verify Address
+  type: http
+  seq: 5
+}
+
+patch {
+  url: {{baseUrl}}/api/addresses/{{addressId}}/verify
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "verified": true
+  }
+}
+
+vars:pre-request {
+  baseUrl: http://localhost:3000
+  token: {{token}}
+  addressId: 1
+}
+
+docs {
+  Marque une adresse comme vérifiée (badge fiabilité).
+  
+  - verified: true ou false
+  - L'utilisateur doit être propriétaire de l'adresse
+  
+  Réponse attendue:
+  - 200 + item mis à jour
+  - 400 si verified invalide
+  - 404 si adresse inconnue
+  - 403 si non authentifié
+}
